@@ -67,6 +67,7 @@ student_outcome_prediction/
 ├── LICENSE
 └── data/                      # (git-ignored) Put your Kaggle CSV here
 ```
+
 ---
 
 ## Dataset
@@ -77,11 +78,6 @@ License: CC-BY-4.0
 
 ---
 
-##  Original write-up & references
-See docs/original_blog.md for the complete literature review and discussion copied from the original README.
-
----
-
-## For Theory and Walkthrough::
+## Theory and Walkthrough
 
 #### [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
