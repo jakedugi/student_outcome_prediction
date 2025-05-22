@@ -38,7 +38,7 @@ RANDOM_STATE: int = 42
 # dataclasses
 @dataclass(frozen=True, slots=True)
 class TrainSettings:
-    """Hyper-parameters that might change between runs."""
+    """Hyper-parameters that might change between runs"""
     test_size: float = TEST_SIZE
     random_state: int = RANDOM_STATE
     models: tuple[str, ...] = field(

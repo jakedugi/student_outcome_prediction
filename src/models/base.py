@@ -11,7 +11,7 @@ logger = utils.logger
 
 
 class BaseClassifier(abc.ABC):
-    """Abstract wrapper that enforces fit / predict / evaluate signature."""
+    """Abstract wrapper that enforces fit / predict / evaluate signature"""
 
     model_name: str = "base"
 

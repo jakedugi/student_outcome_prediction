@@ -9,7 +9,7 @@ logger = logging.getLogger("sopipeline")
 
 
 def timer(fn):
-    """Simple decorator to log a function's runtime."""
+    """Simple decorator to log a function's runtime"""
 
     @wraps(fn)
     def wrapper(*args, **kwargs):

@@ -20,7 +20,7 @@ from ..utils import logger
 
 
 def _wrap(name: str, estimator_cls, **default_kwargs) -> type[BaseClassifier]:
-    """Factory to produce tiny concrete wrapper classes in 3 lines."""
+    """Factory to produce tiny concrete wrapper classes in 3 lines"""
 
     class _Model(BaseClassifier):
         model_name = name

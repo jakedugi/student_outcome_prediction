@@ -7,7 +7,7 @@ logger = utils.logger
 
 
 class DataLoader:
-    """Simple csv to DataFrame loader."""
+    """Simple csv to DataFrame loader"""
 
     def __init__(self, csv_path: str | Path | None = None) -> None:
         self.csv_path = Path(csv_path or config.DEFAULT_CSV)

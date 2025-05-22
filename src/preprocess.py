@@ -11,7 +11,7 @@ logger = utils.logger
 @dataclass
 class Preprocessor:
     """
-    Fits scalers/encoders on training data and transforms splits consistently.
+    Fits scalers/encoders on training data and transforms splits consistently
     """
 
     standard_scaler: StandardScaler = field(

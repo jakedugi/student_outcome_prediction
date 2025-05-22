@@ -28,7 +28,7 @@ class TrainingPipeline:
     # run
     @utils.timer
     def run(self, semesters: int = 2) -> List[Dict[str, Any]]:
-        """Train configured models and return metrics for each."""
+        """Train configured models and return metrics for each"""
         raw_df = self.loader.load()
         df = self.pre.fit_transform(raw_df)
         df = self.pre.semester_features(df, semesters)
