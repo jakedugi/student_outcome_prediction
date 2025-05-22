@@ -81,7 +81,7 @@ License: CC-BY-4.0
 See docs/original_blog.md for the complete literature review and discussion copied from the original README.
 
 ---
-## Read my tutorial:
 
-For theory and walkthrough:
-### [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
+## For Theory and Walkthrough::
+
+#### [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
