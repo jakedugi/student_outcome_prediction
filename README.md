@@ -5,10 +5,15 @@ How to test and build a state-of-the-art student outcome prediction model
 
 ## Highlights
 
-* **CLI** – `python main.py train` trains and ranks all models in seconds.
-* **Registry** – add/remove a model in one line (`src/models/registry.py`).
+* **One-command training** – Run `python main.py train` to load, preprocess, train, and evaluate all models across semesters.
+* **Modular design** – Easily swap models, scalers, or features with minimal edits thanks to the `Preprocessor`, `BaseClassifier`, and `TrainingPipeline` abstractions.
+* **No notebooks required** – View rich evaluation metrics and model rankings directly in the terminal.
+* **Fast model extension** – Add or remove models with one line in `src/models/registry.py`.
+* **Production-ready layout** – Designed for clarity, reproducibility, and maintainability.
 * **Rich leaderboard output** – no notebooks needed to compare models.
 
+---
+# Example Output
 | Semester horizon | Best accuracy (2021 kaggle dataset) |
 |------------------|-------------------------------------|
 | 0 (new admit)    | 0.65 ← GradientBoosting |
@@ -33,10 +38,26 @@ python main.py train --semesters 1
 python main.py train --semesters 0
 
 ## Project structure
-src/…           core library code
-main.py         CLI entry-point
-artifacts/      auto-generated plots & models
-data/           (git-ignored) place your CSV here
+```text
+student_outcome_prediction/
+├── src/                       # Core pipeline modules
+│   ├── config.py              # Global constants & model settings
+│   ├── data_loader.py         # CSV → DataFrame loader
+│   ├── preprocess.py          # Feature scaling and label encoding
+│   ├── split.py               # Train-test splitting logic
+│   ├── pipeline.py            # Full training + evaluation pipeline
+│   ├── utils.py               # Logging + decorators
+│   └── models/                # All model implementations
+│       ├── base.py            # Shared BaseClassifier interface
+│       ├── registry.py        # Model lookup registry
+│       ├── sklearn_wrappers.py# scikit-learn classifiers
+│       └── neural_net.py      # Keras neural network wrapper
+├── main.py                    # CLI entry point
+├── requirements.txt           # Dependencies
+├── README.md                  # Project overview
+├── LICENSE
+└── data/                      # (git-ignored) Put your Kaggle CSV here
+```
 
 ## Dataset
 Kaggle – Higher Education: Predictors of Student Retention
