@@ -1,0 +1,35 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environments
+.venv/
+env/
+ENV/
+venv/
+.ipynb_checkpoints/
+
+# Data & models
+data/
+!data/.gitkeep             # include empty folder structure
+artifacts/
+*.pkl
+*.h5
+*.model
+*.joblib
+
+# Jupyter / Colab
+*.ipynb
+.DS_Store
+
+# Logs and temp
+*.log
+*.tmp
+
+# VSCode
+.vscode/
+
+# OS
+Thumbs.db

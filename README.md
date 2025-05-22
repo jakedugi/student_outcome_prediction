@@ -1,24 +1,25 @@
 # Student Outcome Prediction
-How to test and build a state-of-the-art student outcome prediction model
+Train and evaluate a state-of-the-art model for predicting student outcomes using ML pipelines.
 
 ---
 
 ## Highlights
 
 * **One-command training** – Run `python main.py train` to load, preprocess, train, and evaluate all models across semesters.
-* **Modular design** – Easily swap models, scalers, or features with minimal edits thanks to the `Preprocessor`, `BaseClassifier`, and `TrainingPipeline` abstractions.
-* **No notebooks required** – View rich evaluation metrics and model rankings directly in the terminal.
+* **Modular design** – Swap models, scalers, or features with minimal edits via `Preprocessor`, `BaseClassifier`, and `TrainingPipeline`.
+* **No notebooks required** – See rich evaluation metrics and model rankings directly in the terminal.
 * **Fast model extension** – Add or remove models with one line in `src/models/registry.py`.
 * **Production-ready layout** – Designed for clarity, reproducibility, and maintainability.
-* **Rich leaderboard output** – no notebooks needed to compare models.
 
 ---
+
 # Example Output
-| Semester horizon | Best accuracy (2021 kaggle dataset) |
-|------------------|-------------------------------------|
-| 0 (new admit)    | 0.65 ← GradientBoosting |
-| 1                | 0.75 ← GradientBoosting |
-| 2                | 0.77 ← XGBoost |
+
+| Semester horizon | Best accuracy (2021 Kaggle dataset) |
+|------------------|--------------------------------------|
+| 0 (new admit)    | 0.65 ← GradientBoosting              |
+| 1                | 0.75 ← GradientBoosting              |
+| 2                | 0.77 ← XGBoost                       |
 
 ---
 
@@ -31,11 +32,14 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-# download the CSV to data/studentkaggledataset.csv (see kaggle link below)
+Download the Kaggle CSV and save it to:
+data/studentkaggledataset.csv
 
 python main.py train           # 2-semester baseline
 python main.py train --semesters 1
 python main.py train --semesters 0
+
+---
 
 ## Project structure
 ```text
@@ -58,14 +62,19 @@ student_outcome_prediction/
 ├── LICENSE
 └── data/                      # (git-ignored) Put your Kaggle CSV here
 ```
+---
 
 ## Dataset
-Kaggle – Higher Education: Predictors of Student Retention
-Dataset license: CC-BY-4.0.
+
+Kaggle: Higher Education: Predictors of Student Retention
+License: CC-BY-4.0
+
+---
 
 ##  Original write-up & references
 See docs/original_blog.md for the complete literature review and discussion copied from the original README.
 
+---
+Read the tutorial:
 
-
-## [Tutorial Blog](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
+## [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
