@@ -23,7 +23,7 @@ Train and evaluate a state-of-the-art model for predicting student outcomes usin
 
 ---
 
-## 🚀 Quick-start
+## Quick-start
 
 ```bash
 git clone https://github.com/<yourhandle>/student_outcome_prediction.git
