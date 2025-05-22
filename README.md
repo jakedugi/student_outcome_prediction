@@ -23,21 +23,26 @@ Train and evaluate a state-of-the-art model for predicting student outcomes usin
 
 ---
 
-## 🚀 Quick-start
+## Quick-start
 
 ```bash
-git clone https://github.com/<yourhandle>/student_outcome_prediction.git
+git clone https://github.com/jakedugi/student_outcome_prediction.git
 cd student_outcome_prediction
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
 Download the Kaggle CSV and save it to:
+```bash
 data/studentkaggledataset.csv
+```
 
+Then run:
+```bash
 python main.py train           # 2-semester baseline
 python main.py train --semesters 1
 python main.py train --semesters 0
+```
 
 ---
 
@@ -66,7 +71,8 @@ student_outcome_prediction/
 
 ## Dataset
 
-Kaggle: Higher Education: Predictors of Student Retention
+Kaggle: [Higher Education: Predictors of Student Retention](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention/data)
+
 License: CC-BY-4.0
 
 ---
@@ -75,6 +81,7 @@ License: CC-BY-4.0
 See docs/original_blog.md for the complete literature review and discussion copied from the original README.
 
 ---
-Read the tutorial:
 
-## [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
+## For Theory and Walkthrough::
+
+#### [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
