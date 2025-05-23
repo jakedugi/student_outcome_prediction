@@ -4,7 +4,7 @@ Train and evaluate a state-of-the-art model for predicting student outcomes usin
 
 ---
 
-## Highlights
+## 🚀 Highlights
 
 - **One-command pipeline** – `python main.py train` runs the full pipeline: data loading, preprocessing, training, and evaluation.
 - **Modular architecture** – Swap models, scalers, or input features using clean abstractions (`Preprocessor`, `BaseClassifier`, `TrainingPipeline`).
@@ -14,25 +14,17 @@ Train and evaluate a state-of-the-art model for predicting student outcomes usin
 
 ---
 
-#  Example Output (2-Semester Accuracy Leaderboard)
+## 🧪 Example Output (Accuracy by Semester)
 
-```bash
- Leaderboard
-random_forest      -> accuracy = 0.775
-xgboost            -> accuracy = 0.764
-gradient_boosting  -> accuracy = 0.762
-adaboost           -> accuracy = 0.750
-log_reg            -> accuracy = 0.737
-qda                -> accuracy = 0.708
-decision_tree      -> accuracy = 0.687
-neural_net         -> accuracy = 0.676
-naive_bayes        -> accuracy = 0.667
-svm                -> accuracy = 0.537
-knn                -> accuracy = 0.489
-```
+| Semester Horizon | Best Accuracy (Kaggle Dataset) | Top Model           |
+|------------------|-------------------------------|---------------------|
+| 0 (New Admit)    | 0.65                          | GradientBoosting    |
+| 1 Semester       | 0.74                          | XGBoost             |
+| 2 Semesters      | 0.78                          | RandomForest        |
+
 ---
 
-## Quick-start
+## ⚡ Quick Start
 
 ```bash
 git clone https://github.com/jakedugi/student_outcome_prediction.git
@@ -48,15 +40,16 @@ data/dataset.csv
 ```
 
 Then run:
+
 ```bash
-python main.py train            # Full 2-semester baseline
+python main.py train             # Full 2-semester baseline
 python main.py train --semesters 1
 python main.py train --semesters 0
 ```
 
 ---
 
-## Project structure
+## 🗂 Project Structure
 
 ```text
 student_outcome_prediction/
@@ -81,15 +74,15 @@ student_outcome_prediction/
 
 ---
 
-## Dataset
+## 📊 Dataset
 
 **Source:** [Kaggle – Higher Education: Predictors of Student Retention](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention/data)  
 **License:** CC-BY-4.0
 
 ---
 
-## Theory and Walkthrough
+## 📚 Theory & Walkthrough
 
 Read the full blog and literature-backed discussion:
 
-[Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
+👉 [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
