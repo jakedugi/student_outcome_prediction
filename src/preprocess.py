@@ -45,8 +45,18 @@ class Preprocessor:
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         """Applies fitted transforms; returns a copy (does not modify in place)."""
         out = df.copy()
+        # Convert numeric columns to float64 before scaling
+        out[config.NUMERIC_COLUMNS] = out[config.NUMERIC_COLUMNS].astype('float64')
         num_scaled = self.standard_scaler.transform(out[config.NUMERIC_COLUMNS])
-        out.loc[:, config.NUMERIC_COLUMNS] = self.minmax_scaler.transform(pd.DataFrame(num_scaled, columns=config.NUMERIC_COLUMNS))
+        # Create DataFrame with proper column names and dtypes
+        scaled_df = pd.DataFrame(num_scaled, columns=config.NUMERIC_COLUMNS, index=out.index, dtype='float64')
+        scaled_df = pd.DataFrame(
+            self.minmax_scaler.transform(scaled_df),
+            columns=config.NUMERIC_COLUMNS,
+            index=out.index,
+            dtype='float64'
+        )
+        out.loc[:, config.NUMERIC_COLUMNS] = scaled_df
         # encode target if present
         if config.TARGET in out.columns:
             out[config.TARGET] = self.target_encoder.transform(out[config.TARGET])

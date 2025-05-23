@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 Download the Kaggle CSV and save it to:
 ```bash
-data/studentkaggledataset.csv
+data/dataset.csv
 ```
 
 Then run:

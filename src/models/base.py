@@ -4,7 +4,7 @@ from typing import Dict, Any
 import numpy as np
 import pandas as pd
 from sklearn.metrics import classification_report, accuracy_score
-from . import utils  # relative import inside models package
+from .. import utils  # import from parent package
 from .. import config
 
 logger = utils.logger

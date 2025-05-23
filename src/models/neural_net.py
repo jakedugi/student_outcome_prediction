@@ -3,7 +3,7 @@ from typing import Dict, Any
 import numpy as np
 import pandas as pd
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Input
 from keras.optimizers import Adam
 from .base import BaseClassifier
 from ..utils import logger
@@ -17,13 +17,12 @@ class NeuralNet(BaseClassifier):
         self._build_model = None  # lazy
 
     def _create_model(self, input_dim: int, num_classes: int):
-        model = Sequential(
-            [
-                Dense(16, activation="relu", input_dim=input_dim),
-                Dense(8, activation="relu"),
-                Dense(num_classes, activation="softmax"),
-            ]
-        )
+        model = Sequential([
+            Input(shape=(input_dim,)),
+            Dense(16, activation="relu"),
+            Dense(8, activation="relu"),
+            Dense(num_classes, activation="softmax"),
+        ])
         model.compile(
             optimizer=Adam(learning_rate=1e-3),
             loss="sparse_categorical_crossentropy",

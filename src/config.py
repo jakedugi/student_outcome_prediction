@@ -6,7 +6,7 @@ from typing import Sequence
 # paths
 ROOT: Path = Path(__file__).resolve().parents[1]
 DATA_DIR: Path = ROOT / "data"
-DEFAULT_CSV: Path = DATA_DIR / "studentkaggledataset.csv"
+DEFAULT_CSV: Path = DATA_DIR / "dataset.csv"
 ARTIFACT_DIR: Path = ROOT / "artifacts"
 ARTIFACT_DIR.mkdir(exist_ok=True)
 
