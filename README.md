@@ -14,7 +14,7 @@ Train and evaluate a state-of-the-art model for predicting student outcomes usin
 
 ---
 
-#  Example Output (2-Semester Accuracy Leaderboard)
+##  Example Output (2-Semester Accuracy Leaderboard)
 
 ```bash
  Leaderboard
