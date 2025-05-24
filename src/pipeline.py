@@ -34,6 +34,7 @@ class TrainingPipeline:
         df = self.pre.semester_features(df, semesters)
 
         X_train, X_test, y_train, y_test = make_split(df)
+        feature_names = X_train.columns.tolist()
 
         results: List[Dict[str, Any]] = []
         for key in self.settings.models:
@@ -42,6 +43,14 @@ class TrainingPipeline:
             model = ModelCls()
             model.fit(X_train, y_train)
             metrics = model.evaluate(X_test, y_test)
+            
+            # Add visualization-related data
+            metrics.update({
+                'model_obj': model,
+                'X_test': X_test,
+                'y_true': y_test,
+                'feature_names': feature_names
+            })
             results.append(metrics)
 
         return sorted(results, key=lambda x: x["accuracy"], reverse=True)

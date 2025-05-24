@@ -7,3 +7,6 @@ tensorflow>=2.14
 rich>=13.7
 pytest>=7.4.0
 coverage>=7.3.0
+seaborn>=0.12.0
+shap>=0.44.0
+matplotlib>=3.8.0

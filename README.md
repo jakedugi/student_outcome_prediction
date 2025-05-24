@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/jakedugi/student_outcome_prediction/actions/workflows/ci.yml/badge.svg)](https://github.com/jakedugi/student_outcome_prediction/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/jakedugi/student_outcome_prediction/branch/main/graph/badge.svg)](https://codecov.io/gh/jakedugi/student_outcome_prediction)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jakedugi/student_outcome_prediction/blob/main/demo.ipynb)
 
 Train and evaluate a state-of-the-art model for predicting student outcomes using clean, modular ML pipelines.
 
@@ -96,3 +97,11 @@ student_outcome_prediction/
 Read the full blog and literature-backed discussion:
 
 [Tutorial Blog on Medium](https://medium.com/@Jake_2287/student-outcome-prediction-36702de0f4a3)
+
+## Interactive Demo
+
+Check out our [interactive demo notebook](demo.ipynb) to see the model in action:
+- Train and evaluate models with different semester data
+- Visualize model performance with confusion matrices
+- Explore feature importance using SHAP values
+- Run it directly in Google Colab with one click
