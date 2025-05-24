@@ -9,17 +9,67 @@ nb.cells.append(nbf.v4.new_markdown_cell("""# Student Outcome Prediction Demo
 
 This notebook demonstrates the core functionality of our student outcome prediction model."""))
 
-# Cell for Colab setup
+# Add Kaggle dataset setup instructions
+nb.cells.append(nbf.v4.new_markdown_cell("""## ⚠️ Dataset Setup
+
+This demo uses data from Kaggle. To run it, you'll need to:
+
+1. Go to [Kaggle.com](https://www.kaggle.com) → Account → Create API Token
+2. Download your `kaggle.json` file
+3. Upload it when prompted below
+
+> 💡 This is a one-time setup. Your API key will be stored securely."""))
+
+# Cell for Colab setup and Kaggle authentication
 nb.cells.append(nbf.v4.new_code_cell("""# Clone the repository if running in Colab
 try:
     import google.colab
     !git clone https://github.com/jakedugi/student_outcome_prediction.git
     %cd student_outcome_prediction
 except ImportError:
-    pass  # Not running in Colab"""))
+    pass  # Not running in Colab
+
+# Install required packages
+!pip install -q kaggle"""))
+
+# Cell for Kaggle authentication
+nb.cells.append(nbf.v4.new_code_cell("""# Set up Kaggle credentials
+import os
+from pathlib import Path
+
+def setup_kaggle_credentials():
+    try:
+        from google.colab import files
+        print("📤 Please upload your kaggle.json file...")
+        uploaded = files.upload()
+        
+        if not uploaded:
+            raise Exception("No file was uploaded")
+            
+        # Create Kaggle directory and move credentials
+        !mkdir -p ~/.kaggle
+        !cp kaggle.json ~/.kaggle/
+        !chmod 600 ~/.kaggle/kaggle.json
+        print("✅ Kaggle credentials configured successfully!")
+        
+    except ImportError:
+        # Local environment - check if credentials exist
+        kaggle_path = Path.home() / '.kaggle' / 'kaggle.json'
+        if not kaggle_path.exists():
+            print("⚠️ Please place your kaggle.json in:", kaggle_path)
+            return False
+        print("✅ Found existing Kaggle credentials")
+    return True
+
+if setup_kaggle_credentials():
+    print("\\n🔄 Downloading dataset...")
+    !kaggle datasets download -d mohamedhanyyy/higher-education-predictors-of-student-retention --quiet
+    !unzip -q higher-education-predictors-of-student-retention.zip -d data/
+    !rm higher-education-predictors-of-student-retention.zip
+    print("✅ Dataset downloaded and extracted to data/")"""))
 
 # Cell for installing dependencies
-nb.cells.append(nbf.v4.new_code_cell("""# Install dependencies
+nb.cells.append(nbf.v4.new_code_cell("""# Install remaining dependencies
 !pip install -q -r requirements.txt
 !pip install -q seaborn shap"""))
 

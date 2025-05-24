@@ -105,3 +105,61 @@ Check out our [interactive demo notebook](demo.ipynb) to see the model in action
 - Visualize model performance with confusion matrices
 - Explore feature importance using SHAP values
 - Run it directly in Google Colab with one click
+
+## 🎯 Features
+
+- Predicts student retention/dropout likelihood
+- Uses multiple ML models (Random Forest, XGBoost, etc.)
+- Feature importance analysis with SHAP values
+- Comprehensive test coverage and CI/CD pipeline
+- Interactive demo notebook
+
+## 🚀 Quick Start
+
+### Option 1: Run in Google Colab
+
+1. Click the "Open in Colab" badge above
+2. Follow the in-notebook instructions to set up your Kaggle credentials
+3. Run all cells to see the model in action
+
+> ⚠️ The notebook requires a Kaggle account and API credentials.  
+> Don't worry - it's free and takes just a minute to set up!
+
+### Option 2: Run Locally
+
+1. Clone the repository:
+```bash
+git clone https://github.com/jakedugi/student_outcome_prediction.git
+cd student_outcome_prediction
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Set up Kaggle credentials:
+   - Create an account on [Kaggle](https://www.kaggle.com)
+   - Go to Account → Create API Token
+   - Place the downloaded `kaggle.json` in `~/.kaggle/`
+   - Make it readable only by you: `chmod 600 ~/.kaggle/kaggle.json`
+
+4. Run the demo notebook:
+```bash
+jupyter notebook demo.ipynb
+```
+
+## 📊 Dataset
+
+This project uses the ["Higher Education Predictors of Student Retention"](https://www.kaggle.com/datasets/mohamedhanyyy/higher-education-predictors-of-student-retention) dataset from Kaggle. The dataset includes:
+
+- Academic performance metrics
+- Demographic information
+- Enrollment details
+- Student outcomes
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+> Note: The dataset used in this project has its own license terms from Kaggle.
