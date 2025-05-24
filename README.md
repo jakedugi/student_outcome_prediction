@@ -1,5 +1,8 @@
 # Student Outcome Prediction
 
+[![CI](https://github.com/jakedugi/student_outcome_prediction/actions/workflows/ci.yml/badge.svg)](https://github.com/jakedugi/student_outcome_prediction/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jakedugi/student_outcome_prediction/branch/main/graph/badge.svg)](https://codecov.io/gh/jakedugi/student_outcome_prediction)
+
 Train and evaluate a state-of-the-art model for predicting student outcomes using clean, modular ML pipelines.
 
 ---
