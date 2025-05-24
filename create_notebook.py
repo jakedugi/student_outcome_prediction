@@ -1,4 +1,10 @@
 import nbformat as nbf
+import os
+
+# Create data directory and .gitkeep
+os.makedirs("data", exist_ok=True)
+with open("data/.gitkeep", "w") as f:
+    pass
 
 nb = nbf.v4.new_notebook()
 
@@ -30,7 +36,11 @@ except ImportError:
     pass  # Not running in Colab
 
 # Install required packages
-!pip install -q kaggle"""))
+!pip install -q kaggle
+
+# Ensure data directory exists
+import os
+os.makedirs("data", exist_ok=True)"""))
 
 # Cell for Kaggle authentication
 nb.cells.append(nbf.v4.new_code_cell("""# Set up Kaggle credentials
