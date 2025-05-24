@@ -73,7 +73,7 @@ def setup_kaggle_credentials():
 
 if setup_kaggle_credentials():
     print("\\n🔄 Downloading dataset...")
-    !kaggle datasets download -d mohamedhanyyy/higher-education-predictors-of-student-retention --quiet
+    !kaggle datasets download -d thedevastator/higher-education-predictors-of-student-retention --quiet
     !unzip -q higher-education-predictors-of-student-retention.zip -d data/
     !rm higher-education-predictors-of-student-retention.zip
     print("✅ Dataset downloaded and extracted to data/")"""))
