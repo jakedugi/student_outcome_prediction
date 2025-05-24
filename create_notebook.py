@@ -18,7 +18,7 @@ This notebook demonstrates the core functionality of our student outcome predict
 # Add Kaggle dataset setup instructions
 nb.cells.append(nbf.v4.new_markdown_cell("""## ⚠️ Dataset Setup
 
-This demo uses data from Kaggle. To run it, you'll need to:
+This demo uses data from [Kaggle](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention). To run it, you'll need to:
 
 1. Go to [Kaggle.com](https://www.kaggle.com) → Account → Create API Token
 2. Download your `kaggle.json` file
@@ -73,10 +73,14 @@ def setup_kaggle_credentials():
 
 if setup_kaggle_credentials():
     print("\\n🔄 Downloading dataset...")
-    !kaggle datasets download -d thedevastator/higher-education-predictors-of-student-retention --quiet
-    !unzip -q higher-education-predictors-of-student-retention.zip -d data/
-    !rm higher-education-predictors-of-student-retention.zip
-    print("✅ Dataset downloaded and extracted to data/")"""))
+    try:
+        !kaggle datasets download -d thedevastator/higher-education-predictors-of-student-retention --quiet
+        !unzip -q higher-education-predictors-of-student-retention.zip -d data/
+        !rm higher-education-predictors-of-student-retention.zip
+        print("✅ Dataset downloaded and extracted to data/")
+    except Exception as e:
+        print("❌ Failed to download dataset:", str(e))
+        print("⚠️ Please download manually from: https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention")"""))
 
 # Cell for installing dependencies
 nb.cells.append(nbf.v4.new_code_cell("""# Install remaining dependencies

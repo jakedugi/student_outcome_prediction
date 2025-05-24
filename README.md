@@ -45,13 +45,44 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Download the Kaggle CSV and place it at:
+### Dataset Setup
 
+You have two options to get the dataset:
+
+#### Option 1: Using Kaggle API (Recommended)
+
+1. Install the Kaggle package:
 ```bash
-data/dataset.csv
+pip install kaggle
 ```
 
-Then run:
+2. Set up your Kaggle credentials:
+   - Go to [Kaggle.com](https://www.kaggle.com) → Account → Create API Token
+   - Download `kaggle.json`
+   - Place it in `~/.kaggle/` and set permissions:
+```bash
+mkdir -p ~/.kaggle
+mv kaggle.json ~/.kaggle/
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+3. Download the dataset:
+```bash
+kaggle datasets download -d thedevastator/higher-education-predictors-of-student-retention
+unzip higher-education-predictors-of-student-retention.zip -d data/
+rm higher-education-predictors-of-student-retention.zip
+```
+
+#### Option 2: Manual Download
+
+1. Go to [Dataset Page](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention)
+2. Click "Download"
+3. Extract the ZIP file
+4. Place `dataset.csv` in the `data/` directory
+
+### Running the Model
+
+Once the dataset is in place, run:
 ```bash
 python main.py train            # Full 2-semester baseline
 python main.py train --semesters 1
@@ -87,8 +118,14 @@ student_outcome_prediction/
 
 ## Dataset
 
-**Source:** [Kaggle – Higher Education: Predictors of Student Retention](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention/data)  
+**Source:** [Higher Education: Predictors of Student Retention](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention)  
 **License:** CC-BY-4.0
+
+The dataset includes:
+- Academic performance metrics
+- Demographic information
+- Enrollment details
+- Student outcomes
 
 ---
 
@@ -151,7 +188,7 @@ jupyter notebook demo.ipynb
 
 ## 📊 Dataset
 
-This project uses the ["Higher Education Predictors of Student Retention"](https://www.kaggle.com/datasets/mohamedhanyyy/higher-education-predictors-of-student-retention) dataset from Kaggle. The dataset includes:
+This project uses the ["Higher Education Predictors of Student Retention"](https://www.kaggle.com/datasets/thedevastator/higher-education-predictors-of-student-retention) dataset from Kaggle. The dataset includes:
 
 - Academic performance metrics
 - Demographic information
