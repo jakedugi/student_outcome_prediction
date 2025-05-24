@@ -1,5 +1,5 @@
 """Model analysis and visualization utilities."""
-from typing import List, Callable, Optional
+from typing import List, Callable, Optional, Dict
 import numpy as np
 import matplotlib.pyplot as plt
 import shap
@@ -8,11 +8,19 @@ from .. import utils
 
 logger = utils.logger
 
+# Define class descriptions for better readability
+CLASS_DESCRIPTIONS = {
+    0: "Dropout",
+    1: "Enrolled",
+    2: "Graduate"
+}
+
 def plot_feature_importance(
     model_wrapper: BaseClassifier,
     X: np.ndarray,
     feature_names: List[str],
-    max_display: int = 20
+    max_display: int = 20,
+    class_descriptions: Optional[Dict[int, str]] = None
 ) -> None:
     """Plot feature importance using either native feature_importances_ or SHAP values.
     
@@ -21,24 +29,44 @@ def plot_feature_importance(
         X: Feature matrix to explain
         feature_names: List of feature names
         max_display: Maximum number of features to display
+        class_descriptions: Optional mapping of class indices to descriptions
     """
+    # Use default class descriptions if none provided
+    class_desc = class_descriptions or CLASS_DESCRIPTIONS
+    
+    # Clean up feature names for display
+    display_names = [name.replace('_', ' ').title() for name in feature_names]
+    
     model = model_wrapper.estimator
+    plt.style.use('seaborn')  # Use a cleaner style
     
     if hasattr(model, 'feature_importances_'):
         # For tree-based models (Random Forest, XGBoost, etc.)
         importances = model.feature_importances_
         indices = np.argsort(importances)[::-1][:max_display]
         
-        plt.figure(figsize=(10, 6))
-        plt.title(f'Feature Importances ({model_wrapper.model_name})')
-        plt.bar(range(len(indices)), importances[indices])
-        plt.xticks(range(len(indices)), [feature_names[i] for i in indices], rotation=45, ha='right')
+        fig, ax = plt.subplots(figsize=(12, 8))
+        bars = ax.bar(range(len(indices)), importances[indices])
+        
+        # Add value labels on top of bars
+        for bar in bars:
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2., height,
+                   f'{height:.3f}',
+                   ha='center', va='bottom')
+        
+        plt.title(f'Feature Impact on Student Outcomes\n{model_wrapper.model_name}', 
+                 pad=20, wrap=True)
+        plt.xlabel('Features')
+        plt.ylabel('Importance Score')
+        plt.xticks(range(len(indices)), 
+                  [display_names[i] for i in indices],
+                  rotation=45, ha='right')
         plt.tight_layout()
         plt.show()
     else:
         try:
             # For models without feature_importances_, use SHAP
-            # The model wrapper is now callable and SHAP-compatible
             explainer = shap.Explainer(model_wrapper, X)
             shap_values = explainer(X)
             
@@ -47,29 +75,50 @@ def plot_feature_importance(
                 if len(shap_values.shape) > 2:  # Multiclass case
                     # Plot for all classes
                     for class_idx in range(shap_values.shape[2]):
-                        plt.figure(figsize=(10, 6))
+                        plt.figure(figsize=(12, 8))
+                        class_name = class_desc.get(class_idx, f"Class {class_idx}")
+                        
+                        # Custom summary plot with better formatting
                         shap.summary_plot(
                             shap_values[:, :, class_idx],
                             X,
-                            feature_names=feature_names,
+                            feature_names=display_names,
                             plot_type="bar",
                             max_display=max_display,
-                            show=False
+                            show=False,
+                            plot_size=(12, 8)
                         )
-                        plt.title(f'SHAP Values - Class {class_idx} ({model_wrapper.model_name})')
+                        
+                        plt.title(f'Feature Impact on {class_name} Outcome\n{model_wrapper.model_name}',
+                                pad=20, wrap=True)
+                        plt.xlabel('Average Impact on Prediction (SHAP Value)')
+                        
+                        # Add legend explaining SHAP values
+                        plt.figtext(1.02, 0.5, 
+                                  'How to read this plot:\n\n' +
+                                  '• Longer bars = Stronger impact\n' +
+                                  '• Red = Higher feature values\n' +
+                                  '• Blue = Lower feature values\n' +
+                                  '• Values show average impact\n' +
+                                  '  on model predictions',
+                                  fontsize=10, ha='left', va='center',
+                                  bbox=dict(facecolor='white', alpha=0.8))
+                        
                         plt.tight_layout()
                         plt.show()
                 else:  # Binary classification or regression
-                    plt.figure(figsize=(10, 6))
+                    plt.figure(figsize=(12, 8))
                     shap.summary_plot(
                         shap_values,
                         X,
-                        feature_names=feature_names,
+                        feature_names=display_names,
                         plot_type="bar",
                         max_display=max_display,
                         show=False
                     )
-                    plt.title(f'SHAP Values ({model_wrapper.model_name})')
+                    plt.title(f'Feature Impact on Student Outcomes\n{model_wrapper.model_name}',
+                            pad=20, wrap=True)
+                    plt.xlabel('Average Impact on Prediction (SHAP Value)')
                     plt.tight_layout()
                     plt.show()
             
@@ -83,10 +132,15 @@ def plot_feature_importance(
                 importance = np.abs(coef)
                 indices = np.argsort(importance)[::-1][:max_display]
                 
-                plt.figure(figsize=(10, 6))
-                plt.title(f'Feature Coefficients ({model_wrapper.model_name})')
+                plt.figure(figsize=(12, 8))
+                plt.title(f'Feature Impact on Student Outcomes\n{model_wrapper.model_name}',
+                         pad=20, wrap=True)
                 plt.bar(range(len(indices)), importance[indices])
-                plt.xticks(range(len(indices)), [feature_names[i] for i in indices], rotation=45, ha='right')
+                plt.xlabel('Features')
+                plt.ylabel('Absolute Coefficient Value')
+                plt.xticks(range(len(indices)), 
+                          [display_names[i] for i in indices],
+                          rotation=45, ha='right')
                 plt.tight_layout()
                 plt.show()
             else:
