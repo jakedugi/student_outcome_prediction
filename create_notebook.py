@@ -88,7 +88,10 @@ nb.cells.append(nbf.v4.new_code_cell("""# Install remaining dependencies
 !pip install -q seaborn shap"""))
 
 # Cell for imports
-nb.cells.append(nbf.v4.new_code_cell("""import pandas as pd
+nb.cells.append(nbf.v4.new_code_cell("""# Install and import required packages
+!pip install -q seaborn shap
+
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import shap
@@ -96,7 +99,11 @@ from sklearn.metrics import confusion_matrix
 import numpy as np
 
 from src.pipeline import TrainingPipeline
-from src.config import TARGET"""))
+from src.config import TARGET
+
+# Set up plotting style
+plt.style.use('seaborn')  # Set default style
+sns.set_theme()  # Apply seaborn defaults"""))
 
 # Markdown cell for training section
 nb.cells.append(nbf.v4.new_markdown_cell("""## Training the Model
@@ -151,8 +158,8 @@ def plot_feature_importance(model_wrapper, X, feature_names, max_display=15):
     # Clean up feature names for display
     display_names = [name.replace('_', ' ').title() for name in feature_names]
     
-    # Use seaborn style for better aesthetics
-    plt.style.use('seaborn')
+    # Set figure style
+    sns.set_style("whitegrid")  # Use seaborn's whitegrid style
     
     if hasattr(model_wrapper.estimator, 'feature_importances_'):
         # For tree-based models (Random Forest, XGBoost, etc.)
@@ -160,10 +167,10 @@ def plot_feature_importance(model_wrapper, X, feature_names, max_display=15):
         indices = np.argsort(importances)[::-1][:max_display]
         
         fig, ax = plt.subplots(figsize=(12, 8))
-        bars = ax.bar(range(len(indices)), importances[indices])
+        bars = sns.barplot(x=range(len(indices)), y=importances[indices], ax=ax)
         
         # Add value labels on top of bars
-        for bar in bars:
+        for i, bar in enumerate(ax.patches):
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
                    f'{height:.3f}',
@@ -247,10 +254,10 @@ def plot_feature_importance(model_wrapper, X, feature_names, max_display=15):
                 importance = np.abs(coef)
                 indices = np.argsort(importance)[::-1][:max_display]
                 
-                plt.figure(figsize=(12, 8))
+                fig, ax = plt.subplots(figsize=(12, 8))
+                sns.barplot(x=range(len(indices)), y=importance[indices], ax=ax)
                 plt.title(f'Feature Impact on Student Outcomes\\n{model_wrapper.model_name}',
                          pad=20, wrap=True)
-                plt.bar(range(len(indices)), importance[indices])
                 plt.xlabel('Features')
                 plt.ylabel('Absolute Coefficient Value')
                 plt.xticks(range(len(indices)), 
