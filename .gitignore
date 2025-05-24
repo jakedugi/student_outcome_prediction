@@ -22,6 +22,7 @@ artifacts/
 
 # Jupyter / Colab
 *.ipynb
+!demo.ipynb
 .DS_Store
 
 # Logs and temp
