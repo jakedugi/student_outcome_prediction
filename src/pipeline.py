@@ -53,14 +53,18 @@ class TrainingPipeline:
                 logger.info("\nTraining %s ...", key)
                 model = ModelCls()
                 
-                # Train and evaluate
+                # Train model
                 model.fit(X_train, y_train)
+                
+                # Get predictions and evaluate
+                y_pred = model.predict(X_test)
                 metrics = model.evaluate(X_test, y_test)
                 
                 # Add additional data for visualization
                 metrics.update({
                     'X_test': X_test,
                     'y_true': y_test,
+                    'y_pred': y_pred,  # Explicitly include predictions
                     'feature_names': feature_names
                 })
                 results.append(metrics)

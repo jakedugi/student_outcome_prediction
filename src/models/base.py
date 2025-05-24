@@ -28,7 +28,7 @@ class BaseClassifier(abc.ABC):
     def evaluate(self, X: pd.DataFrame, y_true: pd.Series) -> Dict[str, Any]:
         # Get and store predictions
         y_pred = self.predict(X)
-        self._last_predictions = y_pred
+        self._last_predictions = y_pred  # Store for later access
 
         # Calculate metrics
         acc = accuracy_score(y_true, y_pred)
@@ -44,7 +44,7 @@ class BaseClassifier(abc.ABC):
         return {
             "model": self.model_name,
             "accuracy": acc,
-            "y_pred": y_pred,
+            "y_pred": y_pred,  # Always include predictions
             "confusion_matrix": cm,
             "model_obj": self  # Include model object for later use
         }
