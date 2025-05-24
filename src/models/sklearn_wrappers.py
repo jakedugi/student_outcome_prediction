@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any, Dict
+import warnings
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import (
     GradientBoostingClassifier,
@@ -30,11 +31,19 @@ def _wrap(name: str, estimator_cls, **default_kwargs) -> type[BaseClassifier]:
             self.estimator = estimator_cls(**params)
 
         def fit(self, X: pd.DataFrame, y: pd.Series) -> "BaseClassifier":
-            self.estimator.fit(X, y)
+            # Suppress specific warnings during model fitting
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', category=RuntimeWarning)
+                warnings.filterwarnings('ignore', message='.*covariance matrix.*')
+                self.estimator.fit(X, y)
             return self
 
         def predict(self, X: pd.DataFrame) -> np.ndarray:
-            return self.estimator.predict(X)
+            # Suppress warnings during prediction
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', category=RuntimeWarning)
+                warnings.filterwarnings('ignore', message='.*covariance matrix.*')
+                return self.estimator.predict(X)
 
     _Model.__name__ = name  # nice repr in docs
     return _Model
@@ -48,5 +57,5 @@ LogisticReg = _wrap("log_reg", LogisticRegression, max_iter=10000)
 SVM = _wrap("svm", SVC)
 KNN = _wrap("knn", KNeighborsClassifier, n_neighbors=15)
 AdaBoost = _wrap("adaboost", AdaBoostClassifier, n_estimators=200)
-QDA = _wrap("qda", QuadraticDiscriminantAnalysis, reg_param=0.5)
+QDA = _wrap("qda", QuadraticDiscriminantAnalysis, reg_param=0.9, store_covariance=True)  # Much higher regularization
 NaiveBayes = _wrap("naive_bayes", GaussianNB)
