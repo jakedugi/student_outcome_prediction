@@ -36,7 +36,7 @@ RANDOM_STATE: int = 42
 
 
 # dataclasses
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class TrainSettings:
     """Hyper-parameters that might change between runs"""
     test_size: float = TEST_SIZE
