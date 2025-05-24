@@ -101,9 +101,8 @@ import numpy as np
 from src.pipeline import TrainingPipeline
 from src.config import TARGET
 
-# Set up plotting style
-plt.style.use('seaborn')  # Set default style
-sns.set_theme()  # Apply seaborn defaults"""))
+# Apply Seaborn's modern styling
+sns.set_theme(style='whitegrid', font_scale=1.1)  # Slightly larger fonts for better readability"""))
 
 # Markdown cell for training section
 nb.cells.append(nbf.v4.new_markdown_cell("""## Training the Model
@@ -158,16 +157,14 @@ def plot_feature_importance(model_wrapper, X, feature_names, max_display=15):
     # Clean up feature names for display
     display_names = [name.replace('_', ' ').title() for name in feature_names]
     
-    # Set figure style
-    sns.set_style("whitegrid")  # Use seaborn's whitegrid style
-    
     if hasattr(model_wrapper.estimator, 'feature_importances_'):
         # For tree-based models (Random Forest, XGBoost, etc.)
         importances = model_wrapper.estimator.feature_importances_
         indices = np.argsort(importances)[::-1][:max_display]
         
+        # Create figure with seaborn style
         fig, ax = plt.subplots(figsize=(12, 8))
-        bars = sns.barplot(x=range(len(indices)), y=importances[indices], ax=ax)
+        sns.barplot(x=range(len(indices)), y=importances[indices], ax=ax, color='cornflowerblue')
         
         # Add value labels on top of bars
         for i, bar in enumerate(ax.patches):
@@ -255,7 +252,7 @@ def plot_feature_importance(model_wrapper, X, feature_names, max_display=15):
                 indices = np.argsort(importance)[::-1][:max_display]
                 
                 fig, ax = plt.subplots(figsize=(12, 8))
-                sns.barplot(x=range(len(indices)), y=importance[indices], ax=ax)
+                sns.barplot(x=range(len(indices)), y=importance[indices], ax=ax, color='cornflowerblue')
                 plt.title(f'Feature Impact on Student Outcomes\\n{model_wrapper.model_name}',
                          pad=20, wrap=True)
                 plt.xlabel('Features')
