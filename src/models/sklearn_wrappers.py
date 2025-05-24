@@ -45,6 +45,23 @@ def _wrap(name: str, estimator_cls, **default_kwargs) -> type[BaseClassifier]:
                 warnings.filterwarnings('ignore', message='.*covariance matrix.*')
                 return self.estimator.predict(X)
 
+        def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
+            """Get probability estimates - required for SHAP compatibility."""
+            if hasattr(self.estimator, 'predict_proba'):
+                with warnings.catch_warnings():
+                    warnings.filterwarnings('ignore', category=RuntimeWarning)
+                    warnings.filterwarnings('ignore', message='.*covariance matrix.*')
+                    return self.estimator.predict_proba(X)
+            raise NotImplementedError(f"{self.model_name} does not support probability estimates")
+
+        # Make the estimator callable for SHAP
+        def __call__(self, X: pd.DataFrame) -> np.ndarray:
+            """Make the model callable for SHAP compatibility."""
+            try:
+                return self.predict_proba(X)
+            except NotImplementedError:
+                return self.predict(X)
+
     _Model.__name__ = name  # nice repr in docs
     return _Model
 
