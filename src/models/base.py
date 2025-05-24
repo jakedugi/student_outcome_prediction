@@ -30,7 +30,11 @@ class BaseClassifier(abc.ABC):
             "\n%s",
             classification_report(y_true, y_pred, target_names=self._target_names() or None, zero_division=1),
         )
-        return {"model": self.model_name, "accuracy": acc}
+        return {
+            "model": self.model_name,
+            "accuracy": acc,
+            "y_pred": y_pred  # Include predictions in metrics
+        }
 
     # convenience
     def _target_names(self):

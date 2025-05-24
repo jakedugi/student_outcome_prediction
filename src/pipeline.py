@@ -46,6 +46,9 @@ class TrainingPipeline:
             logger.info("\nTraining %s ...", key)
             model = ModelCls()
             model.fit(X_train, y_train)
+            
+            # Get predictions for visualization
+            y_pred = model.predict(X_test)
             metrics = model.evaluate(X_test, y_test)
             
             # Add visualization-related data
@@ -53,6 +56,7 @@ class TrainingPipeline:
                 'model_obj': model,
                 'X_test': X_test,
                 'y_true': y_test,
+                'y_pred': y_pred,  # Add predictions for confusion matrix
                 'feature_names': feature_names
             })
             results.append(metrics)
