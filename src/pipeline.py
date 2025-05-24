@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Dict, Any
 import pandas as pd
+import os
 
 from . import config, utils
 from .data_loader import DataLoader
@@ -29,6 +30,9 @@ class TrainingPipeline:
     @utils.timer
     def run(self, semesters: int = 2) -> List[Dict[str, Any]]:
         """Train configured models and return metrics for each"""
+        # Ensure data directory exists
+        os.makedirs(config.DATA_DIR, exist_ok=True)
+        
         raw_df = self.loader.load()
         df = self.pre.fit_transform(raw_df)
         df = self.pre.semester_features(df, semesters)
