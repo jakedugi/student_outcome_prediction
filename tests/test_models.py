@@ -50,7 +50,9 @@ class TestBaseClassifier:
                 
             def predict(self, X):
                 # Return array of same length as input
-                return np.array([0, 1, 2] * (len(X) // 3) + [0] * (len(X) % 3))
+                preds = np.array([0, 1, 2] * (len(X) // 3) + [0] * (len(X) % 3))
+                self._last_predictions = preds  # Store predictions
+                return preds
         
         model = TestModel()
         results = model.evaluate(X, y)
@@ -71,7 +73,9 @@ class TestBaseClassifier:
                 
             def predict(self, X):
                 # Return array of same length as input
-                return np.array([0, 1, 2] * (len(X) // 3) + [0] * (len(X) % 3))
+                preds = np.array([0, 1, 2] * (len(X) // 3) + [0] * (len(X) % 3))
+                self._last_predictions = preds  # Store predictions
+                return preds
         
         model = TestModel()
         
@@ -85,6 +89,7 @@ class TestBaseClassifier:
         assert last_predictions is not None
         assert isinstance(last_predictions, np.ndarray)
         assert len(last_predictions) == len(X)
+        np.testing.assert_array_equal(last_predictions, predictions)
 
 # Test sklearn wrappers
 class TestSklearnWrappers:
@@ -176,7 +181,9 @@ class TestSklearnWrappers:
         model.estimator = MagicMock()
         model.estimator.fit = mock_fit_with_warning
         
-        with pytest.warns(RuntimeWarning) as record:  # Change from None to RuntimeWarning
+        # Ensure warning is not filtered
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter("always")  # Ensure all warnings are captured
             model.fit(X, y)
-            
-        assert len(record) > 0  # Should capture the warning 
+            assert len(record) > 0
+            assert record[0].category == RuntimeWarning 
