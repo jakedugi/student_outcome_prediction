@@ -176,11 +176,10 @@ class TestSklearnWrappers:
         def mock_fit_with_warning(*args, **kwargs):
             # Force warning to be emitted
             warnings.showwarning(
-                "Test warning",
-                RuntimeWarning,
-                "test_models.py",
-                188,
-                module=warnings
+                message="Test warning",
+                category=RuntimeWarning,
+                filename="test_models.py",
+                lineno=188
             )
             return MagicMock()
 
