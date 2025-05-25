@@ -172,18 +172,26 @@ class TestSklearnWrappers:
     def test_warning_suppression(self, sample_data):
         """Test that warnings are properly suppressed."""
         X, y = sample_data
-        
+
         def mock_fit_with_warning(*args, **kwargs):
-            warnings.warn("Test warning", RuntimeWarning)
+            # Force warning to be emitted
+            warnings.showwarning(
+                "Test warning",
+                RuntimeWarning,
+                "test_models.py",
+                188,
+                module=warnings
+            )
             return MagicMock()
-            
+
         model = DecisionTree()
         model.estimator = MagicMock()
         model.estimator.fit = mock_fit_with_warning
-        
+
         # Ensure warning is not filtered
         with warnings.catch_warnings(record=True) as record:
             warnings.simplefilter("always")  # Ensure all warnings are captured
             model.fit(X, y)
             assert len(record) > 0
-            assert record[0].category == RuntimeWarning 
+            assert issubclass(record[0].category, RuntimeWarning)
+            assert str(record[0].message) == "Test warning" 

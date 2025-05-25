@@ -48,8 +48,18 @@ class TestModelAnalysis:
                     mock_ax = MagicMock()
                     mock_subplots.return_value = (MagicMock(), mock_ax)
                     
-                    # Mock bar plot return
-                    mock_ax.bar.return_value = [MagicMock()]
+                    # Create mock bars with proper height property
+                    mock_bars = []
+                    for height in importances:
+                        mock_bar = MagicMock()
+                        # Use a property mock for get_height
+                        height_prop = PropertyMock(return_value=float(height))
+                        type(mock_bar).get_height = height_prop
+                        mock_bar.get_x.return_value = 0.0
+                        mock_bar.get_width.return_value = 1.0
+                        mock_bars.append(mock_bar)
+                    
+                    mock_ax.bar.return_value = mock_bars
                     
                     model_analysis.plot_feature_importance(
                         mock_model,
@@ -65,10 +75,14 @@ class TestModelAnalysis:
         mock_shap_values.shape = (100, 3, 3)  # (samples, features, classes)
         mock_shap_values.values = np.zeros((100, 3, 3))  # Add actual numpy array
         
+        # Mock feature_importances_ to avoid tree-based path
+        if hasattr(mock_model.estimator, 'feature_importances_'):
+            delattr(mock_model.estimator, 'feature_importances_')
+        
         with patch('matplotlib.pyplot.style.use'):  # Mock style.use
             with patch('shap.Explainer', return_value=mock_explainer) as mock_shap:
                 with patch('matplotlib.pyplot.show'):
-                    with patch('shap.summary_plot'):
+                    with patch('shap.summary_plot') as mock_summary:
                         mock_explainer.return_value = mock_shap_values
                         
                         model_analysis.plot_feature_importance(
@@ -76,6 +90,9 @@ class TestModelAnalysis:
                             sample_data.values,
                             feature_names
                         )
+                        
+                        # Verify SHAP summary plot was called
+                        mock_summary.assert_called()
                 
     def test_plot_feature_importance_linear(self, mock_model, sample_data, feature_names):
         """Test plotting feature importance for linear models."""
@@ -83,13 +100,27 @@ class TestModelAnalysis:
         coef = np.array([0.5, 0.3, 0.2])
         mock_model.estimator.coef_ = coef
         
+        # Remove feature_importances_ to avoid tree-based path
+        if hasattr(mock_model.estimator, 'feature_importances_'):
+            delattr(mock_model.estimator, 'feature_importances_')
+        
         with patch('matplotlib.pyplot.style.use'):  # Mock style.use
             # Mock SHAP to fail
             with patch('shap.Explainer', side_effect=Exception("SHAP failed")):
                 with patch('matplotlib.pyplot.show'):
                     with patch('matplotlib.pyplot.figure'):
                         with patch('matplotlib.pyplot.bar') as mock_bar:
-                            mock_bar.return_value = [MagicMock()]
+                            # Create mock bars with proper height property
+                            mock_bars = []
+                            for height in np.abs(coef):
+                                mock_bar = MagicMock()
+                                height_prop = PropertyMock(return_value=float(height))
+                                type(mock_bar).get_height = height_prop
+                                mock_bar.get_x.return_value = 0.0
+                                mock_bar.get_width.return_value = 1.0
+                                mock_bars.append(mock_bar)
+                            
+                            mock_bar.return_value = mock_bars
                             
                             model_analysis.plot_feature_importance(
                                 mock_model,
