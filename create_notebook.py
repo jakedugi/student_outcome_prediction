@@ -174,8 +174,8 @@ Now let's use SHAP (SHapley Additive exPlanations) values to understand:
 nb.cells.append(nbf.v4.new_code_cell("""# Calculate SHAP values
 print("📊 Calculating feature importance using SHAP...")
 
-def plot_shap_analysis(model, X, feature_names):
-    \"\"\"Create SHAP summary and decision plots for model interpretation.\"\"\"
+def plot_shap_summary_and_importance(model, X, feature_names):
+    \"\"\"Create SHAP summary plots and feature importance plot.\"\"\"
     # Clean up feature names for display
     display_names = [name.replace('_', ' ').title() for name in feature_names]
     
@@ -205,67 +205,31 @@ def plot_shap_analysis(model, X, feature_names):
             plt.title(f"Feature Impact for {class_name}", pad=20)
             plt.tight_layout()
             plt.show()
-
-        # Combined decision plot for all classes
-        plt.figure(figsize=(15, 10))
-        expected_value = explainer.expected_value if hasattr(explainer, 'expected_value') else [0] * 3
-        if isinstance(expected_value, (int, float)):
-            expected_value = [expected_value] * 3
             
-        # Select a subset of samples for clearer visualization
-        n_samples = min(20, len(X))
-        sample_indices = np.random.choice(len(X), n_samples, replace=False)
-        X_subset = X.iloc[sample_indices] if hasattr(X, 'iloc') else X[sample_indices]
-        
-        # Get predictions for coloring
-        if hasattr(model.estimator, 'predict_proba'):
-            predictions = model.estimator.predict_proba(X_subset)
-            pred_classes = np.argmax(predictions, axis=1)
-        else:
-            pred_classes = model.estimator.predict(X_subset)
-        
-        # Create color map for different classes
-        colors = ['#FF9999', '#66B2FF', '#99FF99']
-        sample_colors = [colors[pred] for pred in pred_classes]
-        
-        try:
-            shap.decision_plot(
-                expected_value,
-                [shap_values[i][sample_indices] if isinstance(shap_values, list) 
-                 else shap_values[sample_indices,:,i] for i in range(3)],
-                X_subset,
-                feature_names=display_names,
-                link='logit',
-                feature_order='importance',
-                plot_color=sample_colors,
-                show=False
-            )
-            plt.title("Decision Paths Across All Outcomes", pad=20)
-            plt.tight_layout()
-            plt.show()
-        except Exception as e:
-            print(f"⚠️ Could not compute combined decision plot: {str(e)}")
-            
-        # Feature importance plot
+        # Feature importance plot (vertical bars)
         if hasattr(model.estimator, 'feature_importances_'):
-            plt.figure(figsize=(12, 8))
             importances = model.estimator.feature_importances_
             indices = np.argsort(importances)[::-1][:15]
             
             plt.figure(figsize=(12, 8))
-            bars = plt.barh(range(len(indices)), importances[indices], color='cornflowerblue')
+            bars = plt.bar(range(len(indices)), importances[indices], color='cornflowerblue')
             
             plt.title('Most Important Factors in Predicting Student Outcomes', pad=20)
-            plt.xlabel('Importance Score')
-            plt.ylabel('Factors')
-            plt.yticks(range(len(indices)), [display_names[i] for i in indices])
+            plt.ylabel('Importance Score')
+            plt.xlabel('Factors')
             
-            # Add value labels on the bars
+            # Rotate x-axis labels for better readability
+            plt.xticks(range(len(indices)), 
+                      [display_names[i] for i in indices],
+                      rotation=45,
+                      ha='right')
+            
+            # Add value labels on top of bars
             for bar in bars:
-                width = bar.get_width()
-                plt.text(width, bar.get_y() + bar.get_height()/2, 
-                        f'{width:.3f}', 
-                        ha='left', va='center', fontsize=10)
+                height = bar.get_height()
+                plt.text(bar.get_x() + bar.get_width()/2, height,
+                        f'{height:.3f}',
+                        ha='center', va='bottom')
             
             plt.tight_layout()
             plt.show()
@@ -274,7 +238,8 @@ def plot_shap_analysis(model, X, feature_names):
         print(f"⚠️ Could not compute SHAP values: {str(e)}")
 
 # Generate SHAP analysis plots
-plot_shap_analysis(
+print("\\n📊 Generating feature importance visualizations...")
+plot_shap_summary_and_importance(
     best_result['model_obj'],
     best_result['X_test'],
     best_result['feature_names']
@@ -290,19 +255,9 @@ nb.cells.append(nbf.v4.new_markdown_cell("""### How to Interpret These Plots
    - Color indicates feature value (red = high, blue = low)
    - Width shows distribution of impact
 
-2. **Combined Decision Plot**:
-   - Shows prediction paths for multiple students across all outcomes
-   - Each line represents a student's path to their predicted outcome
-   - Colors indicate the predicted class:
-     - Red = Dropout Risk
-     - Blue = Continuing Studies
-     - Green = Graduation
-   - Steeper slopes indicate stronger feature impact
-   - Path direction shows whether features increase/decrease likelihood
-
-3. **Feature Importance Plot**:
+2. **Feature Importance Plot**:
    - Shows overall ranking of feature importance
-   - Longer bars indicate stronger predictive power
+   - Taller bars indicate stronger predictive power
    - Values show quantitative importance scores
    - Helps identify key factors for intervention
 
