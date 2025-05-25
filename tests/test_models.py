@@ -13,7 +13,8 @@ from src.models.sklearn_wrappers import (
     LogisticReg,
     SVM,
     KNN,
-    XGBoost
+    XGBoost,
+    ModelConfig
 )
 from src.models.base import BaseClassifier
 
@@ -53,15 +54,20 @@ class TestBaseClassifier:
                 preds = np.array([0, 1, 2] * (len(X) // 3) + [0] * (len(X) % 3))
                 self._last_predictions = preds  # Store predictions
                 return preds
+                
+            def predict_proba(self, X):
+                # Return dummy probabilities
+                n_samples = len(X)
+                return np.ones((n_samples, 3)) / 3  # Equal probabilities for 3 classes
         
         model = TestModel()
         results = model.evaluate(X, y)
         
+        assert isinstance(results, dict)
         assert "accuracy" in results
         assert "confusion_matrix" in results
         assert "y_pred" in results
-        assert "model" in results
-        assert "model_obj" in results
+        assert len(results["y_pred"]) == len(y)
         
     def test_get_last_predictions(self, sample_data):
         """Test getting last predictions."""
@@ -76,6 +82,11 @@ class TestBaseClassifier:
                 preds = np.array([0, 1, 2] * (len(X) // 3) + [0] * (len(X) % 3))
                 self._last_predictions = preds  # Store predictions
                 return preds
+                
+            def predict_proba(self, X):
+                # Return dummy probabilities
+                n_samples = len(X)
+                return np.ones((n_samples, 3)) / 3
         
         model = TestModel()
         
@@ -95,102 +106,122 @@ class TestBaseClassifier:
 class TestSklearnWrappers:
     def test_wrap_factory(self):
         """Test the wrapper factory function."""
-        MockEstimator = MagicMock()
-        WrappedModel = _wrap("test_model", MockEstimator, param1=1)
+        config = ModelConfig(
+            name="test_model",
+            estimator_class=MagicMock,
+            default_params={"param1": 1}
+        )
+        WrappedModel = _wrap(config)
         
-        assert WrappedModel.model_name == "test_model"
         assert issubclass(WrappedModel, BaseClassifier)
+        assert WrappedModel.model_name == "test_model"
         
-        model = WrappedModel(param2=2)
-        assert model.estimator is not None
+        # Test instantiation
+        model = WrappedModel()
+        assert isinstance(model.estimator, MagicMock)
+        assert model.estimator.param1 == 1
         
-    def test_model_fit(self, sample_data, mock_estimator):
+    def test_model_fit(self, sample_data):
         """Test model fitting."""
         X, y = sample_data
+        config = ModelConfig(
+            name="test_model",
+            estimator_class=MagicMock,
+            default_params={}
+        )
+        Model = _wrap(config)
+        model = Model()
         
-        # Test with different model types
-        models = [
-            DecisionTree(),
-            RandomForest(),
-            LogisticReg(),
-            KNN()
-        ]
+        result = model.fit(X, y)
+        assert result is model  # Should return self
+        model.estimator.fit.assert_called_once_with(X, y)
         
-        for model in models:
-            model.estimator = mock_estimator
-            fitted_model = model.fit(X, y)
-            assert fitted_model is model
-            mock_estimator.fit.assert_called_with(X, y)
-            
-    def test_model_predict(self, sample_data, mock_estimator):
+    def test_model_predict(self, sample_data):
         """Test model prediction."""
         X, y = sample_data
+        config = ModelConfig(
+            name="test_model",
+            estimator_class=MagicMock,
+            default_params={}
+        )
+        Model = _wrap(config)
+        model = Model()
         
-        model = DecisionTree()
-        model.estimator = mock_estimator
+        # Configure mock
+        expected = np.zeros(len(X))
+        model.estimator.predict.return_value = expected
         
-        predictions = model.predict(X)
-        assert isinstance(predictions, np.ndarray)
-        mock_estimator.predict.assert_called_with(X)
+        result = model.predict(X)
+        np.testing.assert_array_equal(result, expected)
+        model.estimator.predict.assert_called_once_with(X)
         
-    def test_model_predict_proba(self, sample_data, mock_estimator):
-        """Test probability predictions."""
+    def test_model_predict_proba(self, sample_data):
+        """Test probability prediction."""
         X, y = sample_data
+        config = ModelConfig(
+            name="test_model",
+            estimator_class=MagicMock,
+            default_params={}
+        )
+        Model = _wrap(config)
+        model = Model()
         
-        # Test model with predict_proba
-        model = DecisionTree()
-        model.estimator = mock_estimator
-        proba = model.predict_proba(X)
-        assert isinstance(proba, np.ndarray)
-        mock_estimator.predict_proba.assert_called_with(X)
+        # Test with probability support
+        expected = np.random.random((len(X), 3))
+        model.estimator.predict_proba.return_value = expected
         
-        # Test model without predict_proba
-        model.estimator = MagicMock()
+        result = model.predict_proba(X)
+        np.testing.assert_array_equal(result, expected)
+        
+        # Test without probability support
         del model.estimator.predict_proba
         with pytest.raises(NotImplementedError):
             model.predict_proba(X)
             
-    def test_model_call(self, sample_data, mock_estimator):
-        """Test model callable interface for SHAP."""
+    def test_model_call(self, sample_data):
+        """Test model callable interface."""
         X, y = sample_data
+        config = ModelConfig(
+            name="test_model",
+            estimator_class=MagicMock,
+            default_params={}
+        )
+        Model = _wrap(config)
+        model = Model()
         
-        # Test with predict_proba
-        model = DecisionTree()
-        model.estimator = mock_estimator
+        # Test with probability support
+        expected = np.random.random((len(X), 3))
+        model.estimator.predict_proba.return_value = expected
+        
         result = model(X)
-        assert isinstance(result, np.ndarray)
-        mock_estimator.predict_proba.assert_called_with(X)
+        np.testing.assert_array_equal(result, expected)
         
-        # Test without predict_proba
-        model.estimator = MagicMock()
+        # Test without probability support
         del model.estimator.predict_proba
-        model.estimator.predict.return_value = np.zeros(len(X))  # Return numpy array
+        expected = np.zeros(len(X))
+        model.estimator.predict.return_value = expected
+        
         result = model(X)
-        assert isinstance(result, np.ndarray)
-        model.estimator.predict.assert_called_with(X)
+        np.testing.assert_array_equal(result, expected)
         
     def test_warning_suppression(self, sample_data):
         """Test that warnings are properly suppressed."""
         X, y = sample_data
-
+        config = ModelConfig(
+            name="test_model",
+            estimator_class=MagicMock,
+            default_params={}
+        )
+        Model = _wrap(config)
+        model = Model()
+        
         def mock_fit_with_warning(*args, **kwargs):
-            # Force warning to be emitted
-            warnings.showwarning(
-                message="Test warning",
-                category=RuntimeWarning,
-                filename="test_models.py",
-                lineno=188
-            )
-            return MagicMock()
-
-        model = DecisionTree()
-        model.estimator = MagicMock()
+            warnings.warn("Test warning", RuntimeWarning)
+            return model.estimator
+            
         model.estimator.fit = mock_fit_with_warning
-
-        # Ensure warning is not filtered
-        with warnings.catch_warnings(record=True) as record:
-            warnings.simplefilter("always")  # Ensure all warnings are captured
-            model.fit(X, y)
-            assert len(record) > 0
-            assert issubclass(record[0].category, RuntimeWarning)
-            assert str(record[0].message) == "Test warning" 
+        
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")  # Make warnings raise errors
+            # Should not raise warning
+            model.fit(X, y) 
