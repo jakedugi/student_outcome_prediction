@@ -95,25 +95,43 @@ python main.py train --semesters 0   # Entry data only
 
 ## Project structure
 
-```text
 student_outcome_prediction/
 ├── src/                       # Core pipeline modules
-│   ├── config.py              # Global constants & model settings
-│   ├── data_loader.py         # CSV → DataFrame loader
-│   ├── preprocess.py          # Feature scaling and label encoding
-│   ├── split.py               # Train-test splitting logic
-│   ├── pipeline.py            # Full training + evaluation pipeline
-│   ├── utils.py               # Logging + decorators
-│   └── models/                # All model implementations
-│       ├── base.py            # Shared BaseClassifier interface
-│       ├── registry.py        # Model lookup registry
-│       ├── sklearn_wrappers.py# scikit-learn classifiers
-│       └── neural_net.py      # Keras neural network wrapper
-├── main.py                    # CLI entry point
-├── requirements.txt           # Dependencies
-├── README.md                  # Project overview
-├── LICENSE
-└── data/                      # (git-ignored) Place your CSV here
+│   ├── config.py             # Configuration management with YAML support
+│   ├── data_loader.py        # CSV → DataFrame loader with validation
+│   ├── preprocess.py         # Feature scaling and label encoding
+│   ├── split.py             # Train-test splitting with stratification
+│   ├── pipeline.py          # Full training + evaluation pipeline
+│   ├── utils/               # Utility modules
+│   │   ├── __init__.py     # Package initialization
+│   │   └── logging.py      # Structured logging with JSON support
+│   ├── visualization/       # Visualization modules
+│   │   ├── __init__.py     # Package initialization
+│   │   ├── feature_importance.py  # Feature importance plots
+│   │   └── model_analysis.py      # Model performance visualization
+│   └── models/             # Model implementations
+│       ├── __init__.py     # Package initialization
+│       ├── base.py         # Enhanced BaseClassifier with type safety
+│       ├── registry.py     # Model lookup and registration
+│       ├── sklearn_wrappers.py  # Scikit-learn with warning handling
+│       └── neural_net.py   # Keras neural network with proper cleanup
+├── tests/                  # Test suite
+│   ├── __init__.py        # Test package initialization
+│   ├── conftest.py        # Shared test fixtures and configuration
+│   ├── test_main.py       # CLI tests
+│   ├── test_models.py     # Model implementation tests
+│   ├── test_preprocess.py # Preprocessing tests
+│   ├── test_split.py      # Data splitting tests
+│   └── test_visualization.py  # Visualization tests
+├── main.py                # CLI with proper argument handling
+├── requirements.txt       # Comprehensive dependencies
+├── setup.py              # Package installation configuration
+├── README.md             # Project documentation
+├── LICENSE               # Project license
+├── .gitignore           # Git ignore patterns
+├── .pytest.ini          # Pytest configuration
+└── data/                # Data directory (git-ignored)
+    └── dataset.csv      # Input data (example)
 ```
 
 ---
