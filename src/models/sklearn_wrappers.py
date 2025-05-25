@@ -31,21 +31,13 @@ def _wrap(name: str, estimator_cls, **default_kwargs) -> type[BaseClassifier]:
             self.estimator = estimator_cls(**params)
 
         def fit(self, X: pd.DataFrame, y: pd.Series) -> "BaseClassifier":
-            """Fit underlying estimator while suppressing ALL warnings (even direct showwarning calls)."""
+            """Fit underlying estimator, silencing only warnings.warn() calls."""
             import warnings
 
-            # Stash the real showwarning
-            _real_showwarning = warnings.showwarning
-            # Override to a no-op that accepts any kwargs
-            warnings.showwarning = lambda *args, **kwargs: None
-            try:
-                # Also catch/filter any warnings.warn() calls
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    self.estimator.fit(X, y)
-            finally:
-                # Restore
-                warnings.showwarning = _real_showwarning
+            # Only suppress warnings.warn(); do NOT override showwarning()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self.estimator.fit(X, y)
 
             return self
 
