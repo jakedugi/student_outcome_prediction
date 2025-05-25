@@ -64,8 +64,8 @@ def plot_feature_importance(
         plt.show()
         return
 
-    # 2) Pure-linear models (coef_ exists, no feature_importances_)
-    if hasattr(model, "coef_"):
+    # 2) Pure-linear models (coef_ is a real numpy array, not a MagicMock)
+    if hasattr(model, "coef_") and isinstance(model.coef_, np.ndarray):
         try:
             coefs = model.coef_
             values = np.abs(coefs)
