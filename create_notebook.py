@@ -191,19 +191,6 @@ def plot_shap_analysis(model, X, feature_names):
         if isinstance(shap_values, list):
             shap_values = np.array(shap_values)
 
-        # Plot 1: Overall Summary Plot
-        plt.figure(figsize=(14, 10))  # Increased figure size
-        shap.summary_plot(
-            shap_values,
-            X,
-            feature_names=display_names,
-            show=False,
-            plot_size=(12, 8)
-        )
-        plt.title("Feature Impact Across All Outcomes", pad=20)
-        plt.tight_layout()
-        plt.show()
-
         # Plot class-specific summary plots
         class_names = ['Dropout Risk', 'Continuing Studies', 'Graduation']
         for i, class_name in enumerate(class_names):
@@ -219,47 +206,72 @@ def plot_shap_analysis(model, X, feature_names):
             plt.tight_layout()
             plt.show()
 
-        # Decision plots for each class
+        # Combined decision plot for all classes
+        plt.figure(figsize=(15, 10))
         expected_value = explainer.expected_value if hasattr(explainer, 'expected_value') else [0] * 3
         if isinstance(expected_value, (int, float)):
-            expected_value = [expected_value]
+            expected_value = [expected_value] * 3
             
-        for i, class_name in enumerate(class_names):
-            plt.figure(figsize=(12, 8))
+        # Select a subset of samples for clearer visualization
+        n_samples = min(20, len(X))
+        sample_indices = np.random.choice(len(X), n_samples, replace=False)
+        X_subset = X.iloc[sample_indices] if hasattr(X, 'iloc') else X[sample_indices]
+        
+        # Get predictions for coloring
+        if hasattr(model.estimator, 'predict_proba'):
+            predictions = model.estimator.predict_proba(X_subset)
+            pred_classes = np.argmax(predictions, axis=1)
+        else:
+            pred_classes = model.estimator.predict(X_subset)
+        
+        # Create color map for different classes
+        colors = ['#FF9999', '#66B2FF', '#99FF99']
+        sample_colors = [colors[pred] for pred in pred_classes]
+        
+        try:
             shap.decision_plot(
-                expected_value[i] if isinstance(expected_value, list) else expected_value,
-                shap_values[i] if isinstance(shap_values, list) else shap_values[:,:,i],
-                X,
+                expected_value,
+                [shap_values[i][sample_indices] if isinstance(shap_values, list) 
+                 else shap_values[sample_indices,:,i] for i in range(3)],
+                X_subset,
                 feature_names=display_names,
+                link='logit',
+                feature_order='importance',
+                plot_color=sample_colors,
                 show=False
             )
-            plt.title(f"Decision Plot for {class_name}", pad=20)
+            plt.title("Decision Paths Across All Outcomes", pad=20)
+            plt.tight_layout()
+            plt.show()
+        except Exception as e:
+            print(f"⚠️ Could not compute combined decision plot: {str(e)}")
+            
+        # Feature importance plot
+        if hasattr(model.estimator, 'feature_importances_'):
+            plt.figure(figsize=(12, 8))
+            importances = model.estimator.feature_importances_
+            indices = np.argsort(importances)[::-1][:15]
+            
+            plt.figure(figsize=(12, 8))
+            bars = plt.barh(range(len(indices)), importances[indices], color='cornflowerblue')
+            
+            plt.title('Most Important Factors in Predicting Student Outcomes', pad=20)
+            plt.xlabel('Importance Score')
+            plt.ylabel('Factors')
+            plt.yticks(range(len(indices)), [display_names[i] for i in indices])
+            
+            # Add value labels on the bars
+            for bar in bars:
+                width = bar.get_width()
+                plt.text(width, bar.get_y() + bar.get_height()/2, 
+                        f'{width:.3f}', 
+                        ha='left', va='center', fontsize=10)
+            
             plt.tight_layout()
             plt.show()
             
     except Exception as e:
         print(f"⚠️ Could not compute SHAP values: {str(e)}")
-        print("Falling back to feature importances...")
-        
-        if hasattr(model.estimator, 'feature_importances_'):
-            importances = model.estimator.feature_importances_
-            indices = np.argsort(importances)[::-1][:15]
-            
-            fig, ax = plt.subplots(figsize=(12, 8))
-            sns.barplot(x=range(len(indices)), 
-                       y=importances[indices],
-                       ax=ax,
-                       palette='viridis')
-            
-            plt.title('Most Important Factors in Predicting Student Outcomes', pad=20)
-            plt.xlabel('Factors')
-            plt.ylabel('Importance Score')
-            plt.xticks(range(len(indices)),
-                      [display_names[i] for i in indices],
-                      rotation=45,
-                      ha='right')
-            plt.tight_layout()
-            plt.show()
 
 # Generate SHAP analysis plots
 plot_shap_analysis(
@@ -271,23 +283,28 @@ plot_shap_analysis(
 # Add interpretation guidance
 nb.cells.append(nbf.v4.new_markdown_cell("""### How to Interpret These Plots
 
-1. **Overall Summary Plot**:
-   - Shows feature importance across all outcomes
+1. **Class-Specific Summary Plots**:
+   - One plot for each outcome (Dropout Risk, Continuing Studies, Graduation)
+   - Shows how features specifically influence each outcome
    - Features ordered by importance (top = most important)
    - Color indicates feature value (red = high, blue = low)
    - Width shows distribution of impact
 
-2. **Class-Specific Summary Plots**:
-   - One plot for each outcome (Dropout Risk, Continuing Studies, Graduation)
-   - Shows how features specifically influence each outcome
-   - Helps identify risk factors for dropping out vs. success factors for graduation
+2. **Combined Decision Plot**:
+   - Shows prediction paths for multiple students across all outcomes
+   - Each line represents a student's path to their predicted outcome
+   - Colors indicate the predicted class:
+     - Red = Dropout Risk
+     - Blue = Continuing Studies
+     - Green = Graduation
+   - Steeper slopes indicate stronger feature impact
+   - Path direction shows whether features increase/decrease likelihood
 
-3. **Decision Plots**:
-   - Shows how features combine to make predictions
-   - Each line represents a student's prediction path
-   - Start at base value (left), end at final prediction (right)
-   - Steeper slopes = stronger feature impact
-   - Direction shows whether feature increases/decreases likelihood
+3. **Feature Importance Plot**:
+   - Shows overall ranking of feature importance
+   - Longer bars indicate stronger predictive power
+   - Values show quantitative importance scores
+   - Helps identify key factors for intervention
 
 This analysis helps identify:
 - Early warning signs of dropout risk
