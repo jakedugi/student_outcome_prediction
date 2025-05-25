@@ -182,46 +182,68 @@ def plot_shap_analysis(model, X, feature_names):
     try:
         # Create explainer
         if hasattr(model.estimator, 'predict_proba'):
-            explainer = shap.TreeExplainer(model.estimator) if hasattr(model.estimator, 'apply') else shap.KernelExplainer(model.estimator.predict_proba, X)
-            shap_values = explainer.shap_values(X)
+            explainer = shap.TreeExplainer(model.estimator) if hasattr(model.estimator, 'apply') else shap.Explainer(model.estimator)
         else:
-            explainer = shap.TreeExplainer(model.estimator) if hasattr(model.estimator, 'apply') else shap.KernelExplainer(model.estimator.predict, X)
-            shap_values = explainer.shap_values(X)
-            if isinstance(shap_values, list):
-                shap_values = np.array(shap_values)
+            explainer = shap.TreeExplainer(model.estimator) if hasattr(model.estimator, 'apply') else shap.Explainer(model.estimator)
         
-        # Plot 1: Summary Plot for Overall Feature Importance
-        plt.figure(figsize=(12, 8))
+        # Calculate SHAP values
+        shap_values = explainer.shap_values(X)
+        if isinstance(shap_values, list):
+            shap_values = np.array(shap_values)
+
+        # Plot 1: Overall Summary Plot
+        plt.figure(figsize=(14, 10))  # Increased figure size
         shap.summary_plot(
-            shap_values[2] if isinstance(shap_values, list) else shap_values,
+            shap_values,
             X,
             feature_names=display_names,
-            plot_type="bar",
-            show=False
+            show=False,
+            plot_size=(12, 8)
         )
-        plt.title("Overall Impact of Each Factor on Student Success", pad=20)
+        plt.title("Feature Impact Across All Outcomes", pad=20)
         plt.tight_layout()
         plt.show()
 
-        # Plot 2: Detailed Impact Plot
-        plt.figure(figsize=(12, 8))
-        shap.summary_plot(
-            shap_values[2] if isinstance(shap_values, list) else shap_values,
-            X,
-            feature_names=display_names,
-            show=False
-        )
-        plt.title("How Each Factor Influences Graduation Likelihood", pad=20)
-        plt.tight_layout()
-        plt.show()
-        
+        # Plot class-specific summary plots
+        class_names = ['Dropout Risk', 'Continuing Studies', 'Graduation']
+        for i, class_name in enumerate(class_names):
+            plt.figure(figsize=(14, 10))
+            shap.summary_plot(
+                shap_values[i] if isinstance(shap_values, list) else shap_values[:,:,i],
+                X,
+                feature_names=display_names,
+                show=False,
+                plot_size=(12, 8)
+            )
+            plt.title(f"Feature Impact for {class_name}", pad=20)
+            plt.tight_layout()
+            plt.show()
+
+        # Decision plots for each class
+        expected_value = explainer.expected_value if hasattr(explainer, 'expected_value') else [0] * 3
+        if isinstance(expected_value, (int, float)):
+            expected_value = [expected_value]
+            
+        for i, class_name in enumerate(class_names):
+            plt.figure(figsize=(12, 8))
+            shap.decision_plot(
+                expected_value[i] if isinstance(expected_value, list) else expected_value,
+                shap_values[i] if isinstance(shap_values, list) else shap_values[:,:,i],
+                X,
+                feature_names=display_names,
+                show=False
+            )
+            plt.title(f"Decision Plot for {class_name}", pad=20)
+            plt.tight_layout()
+            plt.show()
+            
     except Exception as e:
         print(f"⚠️ Could not compute SHAP values: {str(e)}")
         print("Falling back to feature importances...")
         
         if hasattr(model.estimator, 'feature_importances_'):
             importances = model.estimator.feature_importances_
-            indices = np.argsort(importances)[::-1][:15]  # Top 15 features
+            indices = np.argsort(importances)[::-1][:15]
             
             fig, ax = plt.subplots(figsize=(12, 8))
             sns.barplot(x=range(len(indices)), 
@@ -249,25 +271,29 @@ plot_shap_analysis(
 # Add interpretation guidance
 nb.cells.append(nbf.v4.new_markdown_cell("""### How to Interpret These Plots
 
-1. **Overall Impact Plot** (First Plot):
-   - Longer bars = Stronger influence on predictions
-   - Shows which factors matter most across all outcomes
-   - Helps identify key areas for intervention
+1. **Overall Summary Plot**:
+   - Shows feature importance across all outcomes
+   - Features ordered by importance (top = most important)
+   - Color indicates feature value (red = high, blue = low)
+   - Width shows distribution of impact
 
-2. **Detailed Impact Plot** (Second Plot):
-   - Each dot = One student in our test data
-   - Red = Higher values for that factor
-   - Blue = Lower values for that factor
-   - Position (left/right) = Impact on prediction
-     - Right = Increases likelihood of graduating
-     - Left = Decreases likelihood of graduating
+2. **Class-Specific Summary Plots**:
+   - One plot for each outcome (Dropout Risk, Continuing Studies, Graduation)
+   - Shows how features specifically influence each outcome
+   - Helps identify risk factors for dropping out vs. success factors for graduation
 
-This analysis reveals:
-- Early warning signs that might indicate a student needs support
-- Which factors most strongly predict student success
-- Where interventions might be most effective
+3. **Decision Plots**:
+   - Shows how features combine to make predictions
+   - Each line represents a student's prediction path
+   - Start at base value (left), end at final prediction (right)
+   - Steeper slopes = stronger feature impact
+   - Direction shows whether feature increases/decreases likelihood
 
-For example, if early semester performance strongly impacts outcomes, this suggests the importance of early support systems and monitoring."""))
+This analysis helps identify:
+- Early warning signs of dropout risk
+- Key factors promoting student success
+- How different features interact to influence outcomes
+- Where to focus intervention efforts"""))
 
 # Write the notebook to a file
 with open('demo.ipynb', 'w') as f:
