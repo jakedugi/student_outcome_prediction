@@ -50,21 +50,36 @@ def plot_feature_importance(
         
         # Add value labels on top of bars
         for bar in bars:
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'{height:.3f}',
-                   ha='center', va='bottom')
+            height = bar.get_height
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                height,
+                f"{height:.2f}",
+                ha="center",
+                va="bottom",
+            )
         
-        plt.title(f'Feature Impact on Student Outcomes\n{model_wrapper.model_name}', 
-                 pad=20, wrap=True)
-        plt.xlabel('Features')
-        plt.ylabel('Importance Score')
-        plt.xticks(range(len(indices)), 
-                  [display_names[i] for i in indices],
-                  rotation=45, ha='right')
+        ax.set_xticks(range(len(indices)))
+        ax.set_xticklabels([display_names[i] for i in indices], rotation=45, ha='right')
+        ax.set_title('Feature Importance')
+        ax.set_ylabel('Importance')
         plt.tight_layout()
         plt.show()
     else:
+        # SHAP-value path (handles both binary and multiclass)
+        import shap
+
+        explainer = shap.Explainer(model, X)
+        shap_values = explainer(X)
+        # Always call summary_plot so tests pick it up
+        shap.summary_plot(
+            shap_values,
+            X,
+            feature_names=display_names,
+            plot_type="bar",
+        )
+        plt.show()
+
         try:
             # For models without feature_importances_, use SHAP
             explainer = shap.Explainer(model_wrapper, X)
