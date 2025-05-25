@@ -21,7 +21,8 @@ Using only first-semester data achieves ~74% accuracy — highlighting the value
 **3. Behavior Over Grades**  
 Attendance and participation are more predictive than GPA.
 
-![Feature Importance](reports/feature_importance.png)
+![Feature Importance](https://github.com/user-attachments/assets/20bbfa6c-be17-4f68-b169-06c2e9dd8f04)
+
 
 [Read the full technical breakdown on Medium →](https://medium.com/@jakedugi/student-outcome-prediction-36702de0f4a3)
 
